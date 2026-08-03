@@ -5,8 +5,8 @@ export const HELP_CONTENT = {
   'overview': {
     title: '功能概览',
     html: `<div class="help-doc">
-      <h2>ToolKnit 功能概览</h2>
-      <p>ToolKnit 是一款<strong>纯本地</strong>多功能工具箱桌面应用，涵盖 PDF、图像、音频、视频、文本、计算器、创意和 AI 八大工具分类，所有文件处理均在本地完成，不上传服务器。</p>
+      <h2>Karui 工具箱 功能概览</h2>
+      <p>Karui 工具箱 是一款<strong>纯本地</strong>多功能工具箱桌面应用，涵盖 PDF、图像、音频、视频、文本、计算器、创意和 AI 八大工具分类，所有文件处理均在本地完成，不上传服务器。</p>
 
       <h3>工具分类一览</h3>
       <div class="help-tool-grid">
@@ -50,9 +50,9 @@ export const HELP_CONTENT = {
 
       <h3>安装步骤</h3>
       <ol class="help-steps">
-        <li>下载 ToolKnit 安装包（<code>.exe</code> 安装程序）</li>
+        <li>下载 Karui 工具箱 安装包（<code>.exe</code> 安装程序）</li>
         <li>双击运行安装程序，选择安装路径</li>
-        <li>等待安装完成，桌面会出现 ToolKnit 快捷方式</li>
+        <li>等待安装完成，桌面会出现 Karui 工具箱 快捷方式</li>
         <li>双击快捷方式启动应用</li>
       </ol>
 
@@ -78,10 +78,10 @@ export const HELP_CONTENT = {
       <p>显示当前版本号，点击"检查更新"可手动检测新版本。如果有新版本，会显示更新日志并提示下载。</p>
 
       <h3>默认存储位置</h3>
-      <p>显示文件默认保存路径（通常为"文档"文件夹下的 ToolKnit 目录），点击"打开文件夹"可快速访问。</p>
+      <p>显示文件默认保存路径（通常为"文档"文件夹下的 Karui 工具箱 目录），点击"打开文件夹"可快速访问。</p>
 
-      <h3>帮助与反馈</h3>
-      <p>点击"帮助中心"打开本帮助页面；点击"反馈 BUG"可提交问题反馈。</p>
+      <h3>帮助</h3>
+      <p>点击“帮助中心”即可打开本帮助页面，查看功能说明与常见问题。</p>
     </div>`
   },
 
@@ -91,7 +91,7 @@ export const HELP_CONTENT = {
       <h2>版本更新</h2>
 
       <h3>自动检查更新</h3>
-      <p>ToolKnit 在启动时会自动检查新版本。如果发现新版本，会弹出更新提示窗口，显示新版本号和更新日志。</p>
+      <p>Karui 工具箱 在启动时会自动检查新版本。如果发现新版本，会弹出更新提示窗口，显示新版本号和更新日志。</p>
 
       <h3>手动检查更新</h3>
       <ol class="help-steps">
@@ -317,7 +317,7 @@ export const HELP_CONTENT = {
       <ol class="help-steps">
         <li>上传一张图片（JPG 或 PNG）</li>
         <li>点击"开始生成"</li>
-        <li>等待蜘蛛精灵遮罩层显示生成进度</li>
+        <li>等待 Karui 能量核心遮罩层显示生成进度</li>
         <li>生成完成后自动下载 <code>icons.zip</code></li>
         <li>成功弹框中可点击"打开文件夹"查看文件</li>
       </ol>
@@ -353,7 +353,7 @@ export const HELP_CONTENT = {
         <li><strong>AAC</strong>：高压缩比有损格式</li>
         <li><strong>WAV</strong>：无损未压缩格式</li>
         <li><strong>FLAC</strong>：无损压缩格式</li>
-        <li><strong>OGG</strong>：开源有损格式</li>
+        <li><strong>OGG</strong>：通用有损音频格式</li>
       </ul>
     </div>`
   },
@@ -798,8 +798,8 @@ export const HELP_CONTENT = {
       <h2>常见问题 - 通用</h2>
 
       <div class="help-faq-item">
-        <div class="help-faq-q">Q：ToolKnit 是免费的吗？</div>
-        <div class="help-faq-a">A：是的，ToolKnit 完全免费使用，不包含任何广告或内购。</div>
+        <div class="help-faq-q">Q：Karui 工具箱 是免费的吗？</div>
+        <div class="help-faq-a">A：是的，Karui 工具箱 完全免费使用，不包含任何广告或内购。</div>
       </div>
 
       <div class="help-faq-item">
@@ -819,7 +819,7 @@ export const HELP_CONTENT = {
 
       <div class="help-faq-item">
         <div class="help-faq-q">Q：文件保存在哪里？</div>
-        <div class="help-faq-a">A：默认保存在"文档"文件夹下的 ToolKnit 目录中。可在设置页面查看和打开存储位置。</div>
+        <div class="help-faq-a">A：默认保存在"文档"文件夹下的 Karui 工具箱 目录中。可在设置页面查看和打开存储位置。</div>
       </div>
 
       <div class="help-faq-item">
@@ -836,7 +836,7 @@ export const HELP_CONTENT = {
 
       <div class="help-faq-item">
         <div class="help-faq-q">Q：什么是 FFmpeg 扩展包？</div>
-        <div class="help-faq-a">A：FFmpeg 是一个开源的多媒体处理库，ToolKnit 的音频转换、视频转换等功能依赖它。首次使用相关功能时会自动提示下载。</div>
+        <div class="help-faq-a">A：FFmpeg 是一个多媒体处理组件，Karui 工具箱的音频转换、视频转换等功能依赖它。首次使用相关功能时会自动提示下载。</div>
       </div>
 
       <div class="help-faq-item">
@@ -878,7 +878,7 @@ export const HELP_CONTENT = {
 
       <div class="help-faq-item">
         <div class="help-faq-q">Q：应用会收集使用数据吗？</div>
-        <div class="help-faq-a">A：ToolKnit 不收集任何用户隐私数据，不包含追踪代码或分析工具。</div>
+        <div class="help-faq-a">A：Karui 工具箱 不收集任何用户隐私数据，不包含追踪代码或分析工具。</div>
       </div>
     </div>`
   },

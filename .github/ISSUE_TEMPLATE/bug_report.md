@@ -1,6 +1,6 @@
 ---
 name: Bug 反馈
-about: 创建报告以帮助我们改进 ToolKnit Desktop
+about: 创建报告以帮助我们改进 Karui 工具箱
 title: '[Bug] '
 labels: bug
 assignees: ''
@@ -12,7 +12,7 @@ assignees: ''
 
 ## 复现步骤
 
-1. 打开 ToolKnit
+1. 打开 Karui 工具箱
 2. 点击 '...'
 3. 选择 '...'
 4. 出现错误
@@ -31,7 +31,7 @@ assignees: ''
 
 ## 环境信息
 
-- ToolKnit 版本: [例如 1.0.0]
+- Karui 工具箱 版本: [例如 1.0.0]
 - 操作系统: [例如 Windows 11 23H2]
 - 安装方式: [例如 GitHub Release 安装包 / 源码构建]
 

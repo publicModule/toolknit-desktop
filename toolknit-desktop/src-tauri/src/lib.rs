@@ -1,15 +1,15 @@
 use tauri::Manager;
 
 /// Read the installer language at startup (from install_lang.txt).
-/// Returns "zh" or "en", defaulting to "en" on any error.
+/// Returns "zh" or "en", defaulting to "zh" on any error.
 fn read_initial_lang() -> String {
     let exe = match std::env::current_exe() {
         Ok(e) => e,
-        Err(_) => return "en".to_string(),
+        Err(_) => return "zh".to_string(),
     };
     let dir = match exe.parent() {
         Some(d) => d,
-        None => return "en".to_string(),
+        None => return "zh".to_string(),
     };
     let lang_file = dir.join("install_lang.txt");
     match std::fs::read_to_string(&lang_file) {
@@ -19,16 +19,16 @@ fn read_initial_lang() -> String {
                 _ => "en".to_string(),
             }
         }
-        Err(_) => "en".to_string(),
+        Err(_) => "zh".to_string(),
     }
 }
 
 /// Build the tray menu with labels in the given language.
 fn build_tray_menu(app: &tauri::AppHandle, lang: &str) -> Result<tauri::menu::Menu<tauri::Wry>, tauri::Error> {
     let (show_text, quit_text) = if lang == "zh" {
-        ("\u{663e}\u{793a}\u{4e3b}\u{7a0b}\u{5e8f}", "\u{9000}\u{51fa} ToolKnit")
+        ("\u{663e}\u{793a}\u{4e3b}\u{7a0b}\u{5e8f}", "\u{9000}\u{51fa} Karui 工具箱")
     } else {
-        ("Show ToolKnit", "Quit ToolKnit")
+        ("Show Karui 工具箱", "Quit Karui 工具箱")
     };
     let show_i = tauri::menu::MenuItem::with_id(app, "show", show_text, true, None::<&str>)?;
     let quit_i = tauri::menu::MenuItem::with_id(app, "quit", quit_text, true, None::<&str>)?;
@@ -111,10 +111,10 @@ fn get_install_config() -> Result<InstallConfig, String> {
     // Fallback: return defaults if install_config.json not found (e.g. running without installer)
     if config_file.is_none() {
         let default_path = dirs::document_dir()
-            .map(|d| d.join("ToolKnit").to_string_lossy().to_string())
+            .map(|d| d.join("Karui 工具箱").to_string_lossy().to_string())
             .unwrap_or_default();
         return Ok(InstallConfig {
-            language: "en".to_string(),
+            language: "zh".to_string(),
             install_path: default_path,
         });
     }
@@ -147,7 +147,7 @@ fn get_ffmpeg_dir() -> Result<std::path::PathBuf, String> {
     let exe = std::env::current_exe().map_err(|e| e.to_string())?;
     let exe_dir = exe.parent().ok_or("Cannot find exe directory")?;
 
-    // 优先：使用打包内置的 resources/ffmpeg/ 目录（开源版 ffmpeg.exe 已内置）
+    // 优先使用打包内置的 resources/ffmpeg/ 目录。
     let bundled = exe_dir.join("resources").join("ffmpeg");
     if bundled.join("ffmpeg.exe").exists() {
         return Ok(bundled);
@@ -1334,6 +1334,10 @@ fn reveal_in_folder(path: String) -> Result<(), String> {
 #[tauri::command]
 fn open_path(path: String) -> Result<(), String> {
     if path.contains('\0') { return Err("Invalid path".to_string()); }
+    let requested_path = std::path::PathBuf::from(&path);
+    if !requested_path.exists() {
+        std::fs::create_dir_all(&requested_path).map_err(|e| e.to_string())?;
+    }
     #[cfg(target_os = "windows")]
     {
         use std::os::windows::process::CommandExt;

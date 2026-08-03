@@ -2,11 +2,11 @@ import en from './locales/en.json';
 import zh from './locales/zh.json';
 
 const locales = { en, zh };
-const STORAGE_KEY = 'toolknit-lang';
-const INSTALLER_LANG_KEY = 'toolknit-installer-lang';
+const STORAGE_KEY = 'karui-toolbox-lang-v2';
+const INSTALLER_LANG_KEY = 'karui-toolbox-installer-lang';
 
 function normalizeLang(lang) {
-  return lang && locales[lang] ? lang : 'en';
+  return lang && locales[lang] ? lang : 'zh';
 }
 
 let currentLang = normalizeLang(localStorage.getItem(STORAGE_KEY));
@@ -22,7 +22,7 @@ const checkInstallLang = () => {
   import('@tauri-apps/api/core').then(({ invoke }) => {
     invoke('get_install_config')
       .then((config) => {
-        const lang = config.language || 'en';
+        const lang = config.language || 'zh';
         const normalized = normalizeLang(lang);
         const saved = localStorage.getItem(STORAGE_KEY);
         const prevInstallerLang = localStorage.getItem(INSTALLER_LANG_KEY);

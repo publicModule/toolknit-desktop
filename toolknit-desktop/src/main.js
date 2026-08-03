@@ -25,24 +25,50 @@
       renderChangelog();
       const darkveilBg = document.getElementById('darkveilBg');
       if (darkveilBg) {
-        // Randomly choose between the original dark color and a blue variant on each entry
-        const darkveilVariant = Math.random() < 0.5 ? 'original' : 'blue';
-        initDarkVeil(darkveilBg, {
-          hueShift: darkveilVariant === 'blue' ? 220 : 0,
-          noiseIntensity: 0.03,
-          scanlineIntensity: 0,
-          speed: 1.6,
-          scanlineFrequency: 5,
-          warpAmount: 0,
-          resolutionScale: 1
+        // Visual effects must never block the application from starting.
+        requestAnimationFrame(() => {
+          try {
+            initDarkVeil(darkveilBg, {
+              hueShift: 205,
+              noiseIntensity: 0.02,
+              scanlineIntensity: 0,
+              speed: 1.1,
+              scanlineFrequency: 5,
+              warpAmount: 0,
+              resolutionScale: 1
+            });
+            darkveilBg.classList.add('webgl-ready');
+          } catch (error) {
+            console.warn('Karui motion background is using the CSS fallback.', error);
+            darkveilBg.classList.add('webgl-fallback');
+          }
         });
       }
 
       const isTauri = typeof window !== 'undefined' && !!window.__TAURI_INTERNALS__;
       const appWindow = isTauri ? getCurrentWindow() : null;
 
+      // A normal browser cannot launch Windows Explorer. Keep folder buttons from
+      // failing silently in the web preview; the same buttons remain fully native
+      // when the app is running inside Tauri.
+      if (!isTauri) {
+        document.addEventListener('click', (event) => {
+          const button = event.target.closest('button');
+          if (!button) return;
+          const isFolderButton = button.id === 'openStorageFolder' || button.id.endsWith('OpenFolder');
+          if (!isFolderButton) return;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          const message = getLang() === 'zh'
+            ? '浏览器预览无法打开 Windows 文件夹，请在 Karui 工具箱桌面版中使用此功能。'
+            : 'A browser preview cannot open Windows folders. Please use the Karui Toolbox desktop app.';
+          if (typeof window.showToast === 'function') window.showToast(message);
+          else console.info(message);
+        }, true);
+      }
+
       async function getOutputDir(subFolder) {
-        if (!isTauri) return '~/Downloads/ToolKnit/' + subFolder;
+        if (!isTauri) return '~/Downloads/Karui 工具箱/' + subFolder;
         try {
           const { invoke } = await import('@tauri-apps/api/core');
           const config = await invoke('get_install_config');
@@ -54,9 +80,9 @@
         try {
           const { invoke } = await import('@tauri-apps/api/core');
           const docsDir = await invoke('get_documents_dir').catch(() => 'C:\\Users\\Downloads');
-          return docsDir + '\\ToolKnit\\' + subFolder;
+          return docsDir + '\\Karui 工具箱\\' + subFolder;
         } catch (e) {
-          return 'C:\\Users\\Downloads\\ToolKnit\\' + subFolder;
+          return 'C:\\Users\\Downloads\\Karui 工具箱\\' + subFolder;
         }
       }
       const transitionMask = document.getElementById('transitionMask');
@@ -235,7 +261,7 @@
 
           if (transitionMask) transitionMask.classList.remove('visible');
           isSwitching = false;
-        }, 1000);
+        }, 260);
       }
 
       navItems.forEach(item => {
@@ -246,6 +272,99 @@
             switchCategory(category);
           }
         });
+      });
+
+      // Karui home workspace: category shortcuts and global tool search.
+      document.querySelectorAll('.karui-category-button[data-category-target]').forEach(button => {
+        button.addEventListener('click', () => {
+          const category = button.dataset.categoryTarget;
+          if (category) {
+            navigatedFromHome = true;
+            switchCategory(category);
+          }
+        });
+      });
+
+      const homeGlobalSearch = document.getElementById('homeGlobalSearch');
+      const homeSearchSuggestions = document.getElementById('homeSearchSuggestions');
+
+      function getHomeSearchEntries() {
+        return Array.from(document.querySelectorAll('.content-section:not([data-category="home"]) .audio-list-item'))
+          .map(item => {
+            const section = item.closest('.content-section');
+            const title = item.querySelector('.audio-list-title')?.textContent?.trim() || '';
+            const description = item.querySelector('.audio-list-desc')?.textContent?.trim() || '';
+            return {
+              item,
+              tool: item.dataset.tool || '',
+              category: section?.dataset.category || '',
+              title,
+              description,
+              searchText: `${title} ${description} ${item.dataset.tool || ''}`.toLowerCase()
+            };
+          })
+          .filter(entry => entry.tool && entry.category && entry.title);
+      }
+
+      function openHomeSearchEntry(entry) {
+        if (!entry) return;
+        navigatedFromHome = true;
+        if (homeSearchSuggestions) homeSearchSuggestions.classList.remove('visible');
+        switchCategory(entry.category);
+        setTimeout(() => entry.item.click(), 340);
+      }
+
+      function renderHomeSearchSuggestions() {
+        if (!homeGlobalSearch || !homeSearchSuggestions) return [];
+        const query = homeGlobalSearch.value.trim().toLowerCase();
+        if (!query) {
+          homeSearchSuggestions.innerHTML = '';
+          homeSearchSuggestions.classList.remove('visible');
+          return [];
+        }
+
+        const matches = getHomeSearchEntries()
+          .filter(entry => entry.searchText.includes(query))
+          .slice(0, 6);
+
+        homeSearchSuggestions.innerHTML = '';
+        matches.forEach(entry => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'karui-search-result';
+          button.innerHTML = `
+            <span class="karui-search-result-icon"><i data-lucide="arrow-up-right"></i></span>
+            <span class="karui-search-result-copy"><strong></strong><small></small></span>
+          `;
+          button.querySelector('strong').textContent = entry.title;
+          button.querySelector('small').textContent = entry.description;
+          button.addEventListener('click', () => openHomeSearchEntry(entry));
+          homeSearchSuggestions.appendChild(button);
+        });
+
+        homeSearchSuggestions.classList.toggle('visible', matches.length > 0);
+        if (typeof createIcons === 'function') createIcons({ icons });
+        return matches;
+      }
+
+      if (homeGlobalSearch) {
+        homeGlobalSearch.addEventListener('input', renderHomeSearchSuggestions);
+        homeGlobalSearch.addEventListener('focus', renderHomeSearchSuggestions);
+        homeGlobalSearch.addEventListener('keydown', event => {
+          if (event.key === 'Enter') {
+            const matches = renderHomeSearchSuggestions();
+            if (matches[0]) openHomeSearchEntry(matches[0]);
+          }
+          if (event.key === 'Escape' && homeSearchSuggestions) {
+            homeSearchSuggestions.classList.remove('visible');
+          }
+        });
+      }
+
+      document.addEventListener('click', event => {
+        if (!event.target.closest('.karui-search-area') && homeSearchSuggestions) {
+          homeSearchSuggestions.classList.remove('visible');
+        }
       });
 
       if (isTauri && appWindow) {
@@ -311,20 +430,33 @@
 
 
       async function ensureFfmpegAvailable() {
-        if (!isTauri) return false;
+        if (!isTauri) {
+          window.showToast?.(getLang() === 'zh'
+            ? '音视频转换需要在 Karui 工具箱桌面版中运行。'
+            : 'Audio and video conversion requires the Karui Toolbox desktop app.');
+          return false;
+        }
         try {
           const { invoke } = await import('@tauri-apps/api/core');
-          return await invoke('check_ffmpeg');
+          const ready = await invoke('check_ffmpeg');
+          if (!ready) {
+            window.showToast?.(getLang() === 'zh'
+              ? '未检测到 FFmpeg，暂时无法开始转换。'
+              : 'FFmpeg was not found, so conversion cannot start yet.');
+          }
+          return ready;
         } catch (e) {
           console.error('FFmpeg check failed:', e);
+          window.showToast?.(getLang() === 'zh'
+            ? 'FFmpeg 检测失败，请稍后重试。'
+            : 'FFmpeg check failed. Please try again.');
           return false;
         }
       }
 
       // Intercept tool entry: check ffmpeg before opening the tool overlay
       async function openToolWithFfmpegCheck(openFn) {
-        const ready = await ensureFfmpegAvailable();
-        if (ready) openFn();
+        openFn();
       }
 
       // Storage path display + open folder
@@ -570,11 +702,11 @@
         audioConvertOverlay.classList.add('visible');
         if (plasmaBg && !plasmaInstance) {
           plasmaInstance = initPlasma(plasmaBg, {
-            color: '#6B6B6B',
-            speed: 0.8,
+            color: '#36B8C8',
+            speed: 0.52,
             direction: 'forward',
             scale: 1,
-            opacity: 1,
+            opacity: 0.28,
             mouseInteractive: false
           });
         }
@@ -777,8 +909,8 @@
 
       function showSuccessDialog(result) {
         const outputPath = result?.output_dir || (isTauri
-          ? 'C:\\Users\\Downloads\\toolknit-converted'
-          : '~/Downloads/toolknit-converted');
+          ? 'C:\\Users\\Downloads\\karui-toolbox-converted'
+          : '~/Downloads/karui-toolbox-converted');
         const successCount = result?.success_count ?? selectedAudioFiles.length;
         const failCount = result?.fail_count ?? 0;
         const firstFileName = selectedAudioFiles[0]?.name || '';
@@ -867,7 +999,7 @@
             }
             if (!finalOutputDir) {
               const outputDir = await invoke('get_documents_dir').catch(() => 'C:\\Users\\Downloads');
-              finalOutputDir = outputDir + '\\ToolKnit\\Audio';
+              finalOutputDir = outputDir + '\\Karui 工具箱\\Audio';
             }
 
             // Collect file paths from selectedAudioFiles
@@ -1007,7 +1139,7 @@
         imageConvertOverlay.classList.add('visible');
         if (imageConvertPlasmaBg && !imageConvertPlasmaInstance) {
           imageConvertPlasmaInstance = initPlasma(imageConvertPlasmaBg, {
-            color: '#6B6B6B', speed: 0.8, direction: 'forward', scale: 1, opacity: 1, mouseInteractive: false
+            color: '#36B8C8', speed: 0.52, direction: 'forward', scale: 1, opacity: 0.28, mouseInteractive: false
           });
         }
       }
@@ -1152,7 +1284,7 @@
       }
 
       function showImageSuccessDialog(result) {
-        const outputPath = result?.output_dir || (isTauri ? 'C:\\Users\\Downloads\\toolknit-converted' : '~/Downloads/toolknit-converted');
+        const outputPath = result?.output_dir || (isTauri ? 'C:\\Users\\Downloads\\karui-toolbox-converted' : '~/Downloads/karui-toolbox-converted');
         const successCount = result?.success_count ?? selectedImageFiles.length;
         const failCount = result?.fail_count ?? 0;
         const firstFileName = selectedImageFiles[0]?.name || '';
@@ -1212,7 +1344,7 @@
             } catch (e) { console.error('Failed to get install config:', e); }
             if (!finalOutputDir) {
               const outputDir = await invoke('get_documents_dir').catch(() => 'C:\\Users\\Downloads');
-              finalOutputDir = outputDir + '\\ToolKnit\\Images';
+              finalOutputDir = outputDir + '\\Karui 工具箱\\Images';
             }
 
             const inputPaths = selectedImageFiles.map(f => f.path).filter(Boolean);
@@ -1305,7 +1437,7 @@
         imageCompressOverlay.classList.add('visible');
         if (imageCompressPlasmaBg && !imageCompressPlasmaInstance) {
           imageCompressPlasmaInstance = initPlasma(imageCompressPlasmaBg, {
-            color: '#6B6B6B', speed: 0.8, direction: 'forward', scale: 1, opacity: 1, mouseInteractive: false
+            color: '#268FDA', speed: 0.52, direction: 'forward', scale: 1, opacity: 0.24, mouseInteractive: false
           });
         }
       }
@@ -1460,7 +1592,7 @@
       }
 
       function showImageCompressSuccessDialog(result) {
-        const outputPath = result?.output_dir || (isTauri ? 'C:\\Users\\Downloads\\toolknit-compressed' : '~/Downloads/toolknit-compressed');
+        const outputPath = result?.output_dir || (isTauri ? 'C:\\Users\\Downloads\\karui-toolbox-compressed' : '~/Downloads/karui-toolbox-compressed');
         const successCount = result?.success_count ?? selectedImageCompressFiles.length;
         const failCount = result?.fail_count ?? 0;
         const firstFileName = selectedImageCompressFiles[0]?.name || '';
@@ -1533,7 +1665,7 @@
             } catch (e) { console.error('Failed to get install config:', e); }
             if (!finalOutputDir) {
               const outputDir = await invoke('get_documents_dir').catch(() => 'C:\\Users\\Downloads');
-              finalOutputDir = outputDir + '\\ToolKnit\\Images';
+              finalOutputDir = outputDir + '\\Karui 工具箱\\Images';
             }
 
             const inputPaths = selectedImageCompressFiles.map(f => f.path).filter(Boolean);
@@ -1640,7 +1772,7 @@
         iconGenOverlay.classList.add('visible');
         if (iconGenPlasmaBg && !iconGenPlasmaInstance) {
           iconGenPlasmaInstance = initPlasma(iconGenPlasmaBg, {
-            color: '#6B6B6B', speed: 0.8, direction: 'forward', scale: 1, opacity: 1, mouseInteractive: false
+            color: '#36B8C8', speed: 0.52, direction: 'forward', scale: 1, opacity: 0.26, mouseInteractive: false
           });
         }
       }
@@ -2100,7 +2232,7 @@
         videoConvertOverlay.classList.add('visible');
         if (videoConvertPlasmaBg && !videoConvertPlasmaInstance) {
           videoConvertPlasmaInstance = initPlasma(videoConvertPlasmaBg, {
-            color: '#6B6B6B', speed: 0.8, direction: 'forward', scale: 1, opacity: 1, mouseInteractive: false
+            color: '#268FDA', speed: 0.52, direction: 'forward', scale: 1, opacity: 0.24, mouseInteractive: false
           });
         }
       }
@@ -2245,7 +2377,7 @@
       }
 
       function showVideoSuccessDialog(result) {
-        const outputPath = result?.output_dir || (isTauri ? 'C:\\Users\\Downloads\\toolknit-converted' : '~/Downloads/toolknit-converted');
+        const outputPath = result?.output_dir || (isTauri ? 'C:\\Users\\Downloads\\karui-toolbox-converted' : '~/Downloads/karui-toolbox-converted');
         const successCount = result?.success_count ?? selectedVideoFiles.length;
         const failCount = result?.fail_count ?? 0;
         const firstFileName = selectedVideoFiles[0]?.name || '';
@@ -2305,7 +2437,7 @@
             } catch (e) { console.error('Failed to get install config:', e); }
             if (!finalOutputDir) {
               const outputDir = await invoke('get_documents_dir').catch(() => 'C:\\Users\\Downloads');
-              finalOutputDir = outputDir + '\\ToolKnit\\Videos';
+              finalOutputDir = outputDir + '\\Karui 工具箱\\Videos';
             }
 
             const inputPaths = selectedVideoFiles.map(f => f.path).filter(Boolean);
@@ -2412,10 +2544,11 @@
         // Init plasma bg
         if (bpmPlasmaBg && !bpmPlasmaInstance) {
           bpmPlasmaInstance = initPlasma(bpmPlasmaBg, {
-            color: '#6B6B6B',
-            speed: 0.8,
+            color: '#36B8C8',
+            speed: 0.52,
             direction: 'forward',
-            density: 3
+            density: 3,
+            opacity: 0.24
           });
         }
       }
@@ -2943,9 +3076,10 @@
         audioClipHeroTop.style.display = '';
         if (audioClipPlasmaBg && !audioClipPlasmaInstance) {
           audioClipPlasmaInstance = initPlasma(audioClipPlasmaBg, {
-            color: '#6B6B6B',
-            speed: 0.8,
+            color: '#36B8C8',
+            speed: 0.52,
             direction: 'forward',
+            opacity: 0.26,
           });
         }
       }
@@ -3693,9 +3827,10 @@
         audioExtractOverlay.classList.add('visible');
         if (audioExtractPlasmaBg && !audioExtractPlasmaInstance) {
           audioExtractPlasmaInstance = initPlasma(audioExtractPlasmaBg, {
-            color: '#6B6B6B',
-            speed: 0.8,
+            color: '#268FDA',
+            speed: 0.52,
             direction: 'forward',
+            opacity: 0.24,
           });
         }
       }
@@ -3813,7 +3948,7 @@
             }
             if (!finalOutputDir) {
               const outputDir = await invoke('get_documents_dir').catch(() => 'C:\\Users\\Downloads');
-              finalOutputDir = outputDir + '\\ToolKnit\\Audio';
+              finalOutputDir = outputDir + '\\Karui 工具箱\\Audio';
             }
 
             // Ensure ffmpeg is available (prompt user to download if missing)
@@ -3882,7 +4017,7 @@
             if (audioExtractProcessMask) audioExtractProcessMask.classList.remove('visible');
             if (audioExtractProcessBarFill) audioExtractProcessBarFill.style.width = '0%';
             extractState.isProcessing = false;
-            if (audioExtractSuccessPath) audioExtractSuccessPath.textContent = '~/Downloads/toolknit-extracted/';
+            if (audioExtractSuccessPath) audioExtractSuccessPath.textContent = '~/Downloads/karui-toolbox-extracted/';
             if (audioExtractSuccessOverlay) audioExtractSuccessOverlay.classList.add('visible');
           }, 1500);
         }
@@ -4104,7 +4239,7 @@
           if (feedbackFormSubmit) feedbackFormSubmit.disabled = true;
 
           try {
-            const msg = getLang() === 'zh' ? '此功能在开源版中已移除' : 'This feature has been removed in the open-source version.';
+            const msg = getLang() === 'zh' ? '此功能暂未开放' : 'This feature is currently unavailable.';
             window.showToast(msg);
           } finally {
             if (feedbackFormSubmit) feedbackFormSubmit.disabled = false;
@@ -4317,7 +4452,7 @@
       }
 
       function authHeaders(extra = {}) {
-        const token = localStorage.getItem('toolknit_token');
+        const token = localStorage.getItem('karui_toolbox_token');
         const headers = { 'Content-Type': 'application/json', ...extra };
         if (token) headers['Authorization'] = `Bearer ${token}`;
         return headers;
@@ -4364,7 +4499,7 @@
       }
 
       async function restoreSession() {
-        const token = localStorage.getItem('toolknit_token');
+        const token = localStorage.getItem('karui_toolbox_token');
         if (!token) return;
 
         const mask = document.getElementById('autoLoginMask');
@@ -4379,14 +4514,14 @@
 
         const timeoutId = setTimeout(hideMaskOnce, 8000);
 
-        // Open-source version: silent disable, no session restore (no backend)
+        // No backend is configured, so session restore stays disabled.
         clearTimeout(timeoutId);
         hideMaskOnce();
       }
 
       function logout() {
-        localStorage.removeItem('toolknit_token');
-        localStorage.removeItem('toolknit_user');
+        localStorage.removeItem('karui_toolbox_token');
+        localStorage.removeItem('karui_toolbox_user');
         const panel = document.getElementById('personalPanel');
         if (panel) panel.classList.remove('logged-in');
         if (typeof renderFavorites === 'function') renderFavorites();
@@ -4568,13 +4703,13 @@
         el.classList.add('show');
       }
 
-      // Login button in personal panel → disabled in open-source version
+      // Login button in personal panel is disabled when no backend is configured.
       const personalPanel = document.getElementById('personalPanel');
       const loginBtn = personalPanel ? personalPanel.querySelector('.login-btn') : null;
       if (loginBtn) {
         loginBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-          const msg = getLang() === 'zh' ? '登录功能在开源版中已移除' : 'Login has been removed in the open-source version.';
+          const msg = getLang() === 'zh' ? '登录功能暂未开放' : 'Login is currently unavailable.';
           showToast(msg);
         });
       }
@@ -4594,7 +4729,7 @@
       if (btnLogout) {
         btnLogout.addEventListener('click', (e) => {
           e.stopPropagation();
-          const msg = getLang() === 'zh' ? '登录功能在开源版中已移除' : 'Login has been removed in the open-source version.';
+          const msg = getLang() === 'zh' ? '登录功能暂未开放' : 'Login is currently unavailable.';
           showToast(msg);
         });
       }
@@ -4823,7 +4958,7 @@
         const btnRect = loginSubmit.getBoundingClientRect();
         showAuthLoading(btnRect.left + btnRect.width / 2, btnRect.top + btnRect.height / 2);
         try {
-          const msg = getLang() === 'zh' ? '此功能在开源版中已移除' : 'This feature has been removed in the open-source version.';
+          const msg = getLang() === 'zh' ? '此功能暂未开放' : 'This feature is currently unavailable.';
           showAuthError(loginError, msg);
         } finally {
           hideAuthLoading();
@@ -4908,7 +5043,7 @@
         const btnRect = registerSubmit.getBoundingClientRect();
         showAuthLoading(btnRect.left + btnRect.width / 2, btnRect.top + btnRect.height / 2);
         try {
-          const msg = getLang() === 'zh' ? '此功能在开源版中已移除' : 'This feature has been removed in the open-source version.';
+          const msg = getLang() === 'zh' ? '此功能暂未开放' : 'This feature is currently unavailable.';
           showAuthError(registerError2, msg);
         } finally {
           hideAuthLoading();
@@ -4977,8 +5112,8 @@
 
       // Statistics tracking
       (function initStats() {
-        const totalKey = 'toolknit_total_usage';
-        const myKey = 'toolknit_my_usage';
+        const totalKey = 'karui_toolbox_total_usage';
+        const myKey = 'karui_toolbox_my_usage';
 
         function getStoredInt(key, fallback = 0) {
           try {
@@ -5058,12 +5193,12 @@
 
         // Fetch web-side total usage from PHP API
         async function fetchWebTotalUsage() {
-          // Open-source version: silent disable, no remote usage fetch
+          // Remote usage fetch is disabled when no backend is configured.
         }
 
         // Fetch exe-side global total from API
         async function fetchExeApiTotalUsage() {
-          // Open-source version: silent disable, no remote usage fetch
+          // Remote usage fetch is disabled when no backend is configured.
         }
 
         // Report tool usage: local +1 + public API increment
@@ -5073,7 +5208,7 @@
           exeMyUsage += 1;
           setStoredInt(myKey, exeMyUsage);
 
-          // Open-source version: silent disable, no remote usage increment
+          // Remote usage updates are disabled when no backend is configured.
 
           refreshTotalDisplay();
           refreshMyUsageDisplay();
@@ -5105,83 +5240,6 @@
         fetchExeApiTotalUsage();
       })();
 
-      // About-us links
-      const ABOUT_LINKS = {
-        donate: 'https://toolknit.com/donate.html',
-        github: 'https://github.com/2645149786-dotcom',
-        website: 'https://toolknit.com'
-      };
-
-      async function openExternalUrl(url) {
-        if (!url || !/^https?:\/\//i.test(url)) {
-          console.warn('Invalid external URL:', url);
-          return;
-        }
-        if (isTauri) {
-          try {
-            const { invoke } = await import('@tauri-apps/api/core');
-            await invoke('open_url', { url });
-          } catch (err) {
-            console.error('Failed to open URL:', err);
-            window.open(url, '_blank');
-          }
-        } else {
-          window.open(url, '_blank');
-        }
-      }
-
-      document.querySelectorAll('.about-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-          e.preventDefault();
-          const url = ABOUT_LINKS[link.dataset.link];
-          if (url) openExternalUrl(url);
-        });
-      });
-
-      // Donate tooltip hover
-      const donateLink = document.querySelector('.about-link.donate-link');
-      const donateTooltip = document.getElementById('donateTooltip');
-      if (donateLink && donateTooltip) {
-        function positionTooltip() {
-          const rect = donateLink.getBoundingClientRect();
-          const tooltipWidth = donateTooltip.offsetWidth;
-          const tooltipHeight = donateTooltip.offsetHeight;
-          let left = rect.left + rect.width / 2 - tooltipWidth / 2;
-          let top = rect.top - tooltipHeight - 12;
-
-          // Keep within viewport horizontally
-          const padding = 12;
-          if (left < padding) left = padding;
-          if (left + tooltipWidth > window.innerWidth - padding) {
-            left = window.innerWidth - tooltipWidth - padding;
-          }
-
-          // Keep within viewport vertically
-          const flipped = top < padding;
-          if (flipped) {
-            top = rect.bottom + 12;
-          }
-          donateTooltip.classList.toggle('flipped', flipped);
-
-          donateTooltip.style.left = `${left}px`;
-          donateTooltip.style.top = `${top}px`;
-        }
-
-        donateLink.addEventListener('mouseenter', () => {
-          positionTooltip();
-          donateTooltip.classList.add('visible');
-        });
-        donateLink.addEventListener('mouseleave', () => {
-          donateTooltip.classList.remove('visible');
-        });
-
-        window.addEventListener('resize', () => {
-          if (donateTooltip.classList.contains('visible')) {
-            positionTooltip();
-          }
-        });
-      }
-
       // ===== PDF Merger =====
       const pdfMergeOverlay = document.getElementById('pdfMergeOverlay');
       const pdfMergeFerrofluid = document.getElementById('pdfMergeFerrofluid');
@@ -5193,7 +5251,7 @@
         pdfMergeOverlay.classList.add('visible');
         if (pdfMergeFerrofluid && !pdfMergeFerrofluidInstance) {
           pdfMergeFerrofluidInstance = initFerrofluid(pdfMergeFerrofluid, {
-            colors: ['#e8e8ec', '#a0a0a8', '#ffffff'],
+            colors: ['#DDF7F8', '#78D7E0', '#268FDA'],
             speed: 0.3,
             scale: 2,
             turbulence: 1,
@@ -5203,7 +5261,7 @@
             shimmer: 0.5,
             glow: 2.8,
             flowDirection: 'left',
-            opacity: 0.6,
+            opacity: 0.22,
             mouseInteraction: true,
             mouseStrength: 1.6,
             mouseRadius: 0.6,
@@ -5252,10 +5310,10 @@
         pdfSplitOverlay.classList.add('visible');
         if (pdfSplitFerrofluid && !pdfSplitFerrofluidInstance) {
           pdfSplitFerrofluidInstance = initFerrofluid(pdfSplitFerrofluid, {
-            colors: ['#e8e8ec', '#a0a0a8', '#ffffff'],
+            colors: ['#DDF7F8', '#78D7E0', '#268FDA'],
             speed: 0.3,
             scale: 2,
-            opacity: 0.6,
+            opacity: 0.22,
           });
         }
       }
@@ -5829,10 +5887,10 @@
         pdfRotateOverlay.classList.add('visible');
         if (pdfRotateFerrofluid && !pdfRotateFerrofluidInstance) {
           pdfRotateFerrofluidInstance = initFerrofluid(pdfRotateFerrofluid, {
-            colors: ['#e8e8ec', '#a0a0a8', '#ffffff'],
+            colors: ['#DDF7F8', '#78D7E0', '#268FDA'],
             speed: 0.3,
             scale: 2,
-            opacity: 0.6,
+            opacity: 0.22,
           });
         }
       }
@@ -6434,10 +6492,10 @@
         pdfEncryptOverlay.classList.add('visible');
         if (pdfEncryptFerrofluid && !pdfEncryptFerrofluidInstance) {
           pdfEncryptFerrofluidInstance = initFerrofluid(pdfEncryptFerrofluid, {
-            colors: ['#e8e8ec', '#a0a0a8', '#ffffff'],
+            colors: ['#DDF7F8', '#78D7E0', '#268FDA'],
             speed: 0.3,
             scale: 2,
-            opacity: 0.6,
+            opacity: 0.22,
           });
         }
       }
@@ -6861,10 +6919,10 @@
         pdfDecryptOverlay.classList.add('visible');
         if (pdfDecryptFerrofluid && !pdfDecryptFerrofluidInstance) {
           pdfDecryptFerrofluidInstance = initFerrofluid(pdfDecryptFerrofluid, {
-            colors: ['#e8e8ec', '#a0a0a8', '#ffffff'],
+            colors: ['#DDF7F8', '#78D7E0', '#268FDA'],
             speed: 0.3,
             scale: 2,
-            opacity: 0.6,
+            opacity: 0.22,
           });
         }
       }
@@ -7289,10 +7347,10 @@
         pdfEnhanceOverlay.classList.add('visible');
         if (pdfEnhanceFerrofluid && !pdfEnhanceFerrofluidInstance) {
           pdfEnhanceFerrofluidInstance = initFerrofluid(pdfEnhanceFerrofluid, {
-            colors: ['#e8e8ec', '#a0a0a8', '#ffffff'],
+            colors: ['#DDF7F8', '#78D7E0', '#268FDA'],
             speed: 0.3,
             scale: 2,
-            opacity: 0.6,
+            opacity: 0.22,
           });
         }
       }
@@ -8055,7 +8113,7 @@
         resetAiPolishState();
         if (aiPolishBg && !aiPolishDitherInstance) {
           aiPolishDitherInstance = initDither(aiPolishBg, {
-            waveColor: [0.38823529411764707, 0.4, 0.9450980392156862],
+            waveColor: [0.1411764706, 0.5607843137, 0.8549019608],
             colorNum: 40,
             pixelSize: 2,
             waveAmplitude: 0,
@@ -8339,7 +8397,7 @@
         resetAiTranslateState();
         if (aiTranslateBg && !aiTranslateDitherInstance) {
           aiTranslateDitherInstance = initDither(aiTranslateBg, {
-            waveColor: [0.38823529411764707, 0.4, 0.9450980392156862],
+            waveColor: [0.2117647059, 0.7215686275, 0.7843137255],
             colorNum: 40,
             pixelSize: 2,
             waveAmplitude: 0,
@@ -8643,7 +8701,7 @@
         resetAiDocState();
         if (aiDocBg && !aiDocDitherInstance) {
           aiDocDitherInstance = initDither(aiDocBg, {
-            waveColor: [0.38823529411764707, 0.4, 0.9450980392156862],
+            waveColor: [0.1411764706, 0.5607843137, 0.8549019608],
             colorNum: 40,
             pixelSize: 2,
             waveAmplitude: 0,
@@ -8689,7 +8747,7 @@
       function fillUserAvatar(avatarEl) {
         let userAvatarUrl = null, userName = '';
         try {
-          const userJson = localStorage.getItem('toolknit_user');
+          const userJson = localStorage.getItem('karui_toolbox_user');
           if (userJson) {
             const userObj = JSON.parse(userJson);
             userAvatarUrl = userObj.avatar || null;
@@ -8730,7 +8788,7 @@
         avatar.className = 'ai-doc-chat-avatar';
         if (role === 'ai') {
           const img = document.createElement('img');
-          img.src = '/assets/toolknit-icon.png';
+          img.src = '/assets/karui-brand-icon.png';
           img.alt = 'AI';
           img.style.width = '100%';
           img.style.height = '100%';
@@ -8759,7 +8817,7 @@
         const avatar = document.createElement('div');
         avatar.className = 'ai-doc-chat-avatar';
         const img = document.createElement('img');
-        img.src = '/assets/toolknit-icon.png';
+        img.src = '/assets/karui-brand-icon.png';
         img.alt = 'AI';
         img.style.width = '100%';
         img.style.height = '100%';
@@ -8879,7 +8937,7 @@
 5. 闲聊或不需要生成文档时，返回普通文字即可，不要带 JSON
 
 ## JSON 示例（注意内容密度）
-{"ready": true, "summary": "已为您生成产品介绍文档", "pages": [{"regions": [{"type": "page-header", "x": 56, "y": 30, "w": 682, "h": 18, "text": "ToolKnit 桌面版产品介绍", "fontSize": 9, "bold": false, "align": "center"}, {"type": "title", "x": 56, "y": 60, "w": 682, "h": 50, "text": "ToolKnit 桌面版 — 全能本地工具箱", "fontSize": 24, "bold": true, "align": "center"}, {"type": "subtitle", "x": 56, "y": 115, "w": 682, "h": 22, "text": "78+ 款工具 · 100% 离线运行 · 隐私零泄露", "fontSize": 12, "bold": false, "align": "center"}, {"type": "section-heading", "x": 56, "y": 150, "w": 682, "h": 28, "text": "一、产品概述", "fontSize": 14, "bold": true, "align": "left"}, {"type": "body", "x": 56, "y": 184, "w": 682, "h": 76, "text": "ToolKnit 是一款集成了 PDF 处理、图片编辑、视频转换、音频处理、文本工具、计算器、创意设计、AI 智能助手等 10 大分类共 78+ 款工具的桌面应用程序。基于 Tauri 2.x 框架构建，前端采用原生 HTML/CSS/JavaScript，后端使用 Rust 提供高性能本地处理能力。所有文件操作均在用户设备本地完成，不上传任何数据到服务器，从架构层面杜绝隐私泄露风险。", "fontSize": 11.5, "bold": false, "align": "left"}, {"type": "section-heading", "x": 56, "y": 270, "w": 682, "h": 28, "text": "二、技术架构", "fontSize": 14, "bold": true, "align": "left"}, {"type": "body", "x": 56, "y": 304, "w": 682, "h": 93, "text": "ToolKnit 桌面版采用 Tauri 2.x 作为应用框架，相较于 Electron 方案，Tauri 使用系统原生 WebView，安装包体积仅约 15MB，内存占用降低 60% 以上。Rust 后端负责文件 I/O、系统调用、加密解密等高性能任务，前端通过 Tauri IPC 进行通信。PDF 处理基于 pdf-lib-plus-encrypt 库，支持 PDF 合并、拆分、旋转、压缩、加密、解密、水印增强等全套操作。", "fontSize": 11.5, "bold": false, "align": "left"}, {"type": "page-footer", "x": 56, "y": 1085, "w": 682, "h": 18, "text": "第 1 页 / 共 3 页", "fontSize": 9, "bold": false, "align": "center"}]}]}
+{"ready": true, "summary": "已为您生成产品介绍文档", "pages": [{"regions": [{"type": "page-header", "x": 56, "y": 30, "w": 682, "h": 18, "text": "Karui 工具箱 桌面版产品介绍", "fontSize": 9, "bold": false, "align": "center"}, {"type": "title", "x": 56, "y": 60, "w": 682, "h": 50, "text": "Karui 工具箱 桌面版 — 全能本地工具箱", "fontSize": 24, "bold": true, "align": "center"}, {"type": "subtitle", "x": 56, "y": 115, "w": 682, "h": 22, "text": "78+ 款工具 · 100% 离线运行 · 隐私零泄露", "fontSize": 12, "bold": false, "align": "center"}, {"type": "section-heading", "x": 56, "y": 150, "w": 682, "h": 28, "text": "一、产品概述", "fontSize": 14, "bold": true, "align": "left"}, {"type": "body", "x": 56, "y": 184, "w": 682, "h": 76, "text": "Karui 工具箱 是一款集成了 PDF 处理、图片编辑、视频转换、音频处理、文本工具、计算器、创意设计、AI 智能助手等 10 大分类共 78+ 款工具的桌面应用程序。基于 Tauri 2.x 框架构建，前端采用原生 HTML/CSS/JavaScript，后端使用 Rust 提供高性能本地处理能力。所有文件操作均在用户设备本地完成，不上传任何数据到服务器，从架构层面杜绝隐私泄露风险。", "fontSize": 11.5, "bold": false, "align": "left"}, {"type": "section-heading", "x": 56, "y": 270, "w": 682, "h": 28, "text": "二、技术架构", "fontSize": 14, "bold": true, "align": "left"}, {"type": "body", "x": 56, "y": 304, "w": 682, "h": 93, "text": "Karui 工具箱 桌面版采用 Tauri 2.x 作为应用框架，相较于 Electron 方案，Tauri 使用系统原生 WebView，安装包体积仅约 15MB，内存占用降低 60% 以上。Rust 后端负责文件 I/O、系统调用、加密解密等高性能任务，前端通过 Tauri IPC 进行通信。PDF 处理基于 pdf-lib-plus-encrypt 库，支持 PDF 合并、拆分、旋转、压缩、加密、解密、水印增强等全套操作。", "fontSize": 11.5, "bold": false, "align": "left"}, {"type": "page-footer", "x": 56, "y": 1085, "w": 682, "h": 18, "text": "第 1 页 / 共 3 页", "fontSize": 9, "bold": false, "align": "center"}]}]}
 
 坐标系：x 范围 0-794, y 范围 0-1123`;
 
@@ -9087,7 +9145,7 @@
         // Init dither background for edit overlay
         if (aiDocEditBg && !aiDocEditDitherInstance) {
           aiDocEditDitherInstance = initDither(aiDocEditBg, {
-            waveColor: [0.38823529411764707, 0.4, 0.9450980392156862],
+            waveColor: [0.2117647059, 0.7215686275, 0.7843137255],
             colorNum: 40,
             pixelSize: 2,
             waveAmplitude: 0,
@@ -9992,7 +10050,7 @@
         resetAiTableState();
         if (aiTableBg && !aiTableDitherInstance) {
           aiTableDitherInstance = initDither(aiTableBg, {
-            waveColor: [0.38823529411764707, 0.4, 0.9450980392156862],
+            waveColor: [0.1411764706, 0.5607843137, 0.8549019608],
             colorNum: 40, pixelSize: 2, waveAmplitude: 0, waveFrequency: 0, waveSpeed: 0.07
           });
         }
@@ -10031,7 +10089,7 @@
         avatar.className = 'ai-doc-chat-avatar';
         if (role === 'ai') {
           const img = document.createElement('img');
-          img.src = '/assets/toolknit-icon.png'; img.alt = 'AI';
+          img.src = '/assets/karui-brand-icon.png'; img.alt = 'AI';
           img.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;';
           avatar.appendChild(img);
         } else {
@@ -10056,7 +10114,7 @@
         const avatar = document.createElement('div');
         avatar.className = 'ai-doc-chat-avatar';
         const img = document.createElement('img');
-        img.src = '/assets/toolknit-icon.png'; img.alt = 'AI';
+        img.src = '/assets/karui-brand-icon.png'; img.alt = 'AI';
         img.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;';
         avatar.appendChild(img);
         const bubble = document.createElement('div');
@@ -11012,7 +11070,7 @@
         resetColorExtractorState();
         if (colorExtractorBg && !colorExtractorDitherInstance) {
           colorExtractorDitherInstance = initDither(colorExtractorBg, {
-            waveColor: [0.4, 0.5, 0.9], colorNum: 40, pixelSize: 2,
+            waveColor: [0.2117647059, 0.7215686275, 0.7843137255], colorNum: 40, pixelSize: 2,
             waveAmplitude: 0, waveFrequency: 0, waveSpeed: 0.07
           });
         }
@@ -11588,7 +11646,7 @@
         updateTextStats();
         if (textStatsBg && !textStatsPlasmaInstance) {
           textStatsPlasmaInstance = initPlasma(textStatsBg, {
-            color: '#6B6B6B', speed: 0.8, direction: 'forward', scale: 1, opacity: 1, mouseInteractive: false
+            color: '#36B8C8', speed: 0.52, direction: 'forward', scale: 1, opacity: 0.24, mouseInteractive: false
           });
         }
         setTimeout(() => { if (textStatsInput) textStatsInput.focus(); }, 300);
@@ -11711,7 +11769,7 @@
         textFormatOverlay.classList.add('visible');
         if (textFormatBg && !textFormatPlasmaInstance) {
           textFormatPlasmaInstance = initPlasma(textFormatBg, {
-            color: '#6B6B6B', speed: 0.8, direction: 'forward', scale: 1, opacity: 1, mouseInteractive: false
+            color: '#268FDA', speed: 0.52, direction: 'forward', scale: 1, opacity: 0.22, mouseInteractive: false
           });
         }
         setTimeout(() => { if (textFormatInput) textFormatInput.focus(); }, 300);
@@ -12043,7 +12101,14 @@
         selectTypingTestOption(typingTestLangOptions, typingTestState.lang);
         resetTypingTestToSettings();
         if (typingTestBg && !typingTestDitherInstance) {
-          typingTestDitherInstance = initDither(typingTestBg, { color: 'rgba(120,130,255,0.18)', speed: 0.0006 });
+          typingTestDitherInstance = initDither(typingTestBg, {
+            waveColor: [0.2117647059, 0.7215686275, 0.7843137255],
+            colorNum: 40,
+            pixelSize: 2,
+            waveAmplitude: 0.18,
+            waveFrequency: 2.2,
+            waveSpeed: 0.045
+          });
         }
       }
 
@@ -12233,10 +12298,12 @@
         bmiCalcOverlay.classList.add('visible');
         if (bmiCalcBg && !bmiCalcDitherInstance) {
           bmiCalcDitherInstance = initDarkVeil(bmiCalcBg, {
-            hueShift: 0,
-            noiseIntensity: 0.03,
+            hueShift: 205,
+            tintColor: '#36B8C8',
+            lightMode: true,
+            noiseIntensity: 0.012,
             scanlineIntensity: 0,
-            speed: 1.6,
+            speed: 0.72,
             scanlineFrequency: 5,
             warpAmount: 0,
             resolutionScale: 1
@@ -12645,10 +12712,12 @@
         tsCalcOverlay.classList.add('visible');
         if (tsCalcBg && !tsCalcDitherInstance) {
           tsCalcDitherInstance = initDarkVeil(tsCalcBg, {
-            hueShift: 0,
-            noiseIntensity: 0.03,
+            hueShift: 205,
+            tintColor: '#268FDA',
+            lightMode: true,
+            noiseIntensity: 0.012,
             scanlineIntensity: 0,
-            speed: 1.6,
+            speed: 0.72,
             scanlineFrequency: 5,
             warpAmount: 0,
             resolutionScale: 1
@@ -12973,10 +13042,12 @@
         mortgageCalcOverlay.classList.add('visible');
         if (mortgageCalcBg && !mortgageCalcDitherInstance) {
           mortgageCalcDitherInstance = initDarkVeil(mortgageCalcBg, {
-            hueShift: 0,
-            noiseIntensity: 0.03,
+            hueShift: 205,
+            tintColor: '#36B8C8',
+            lightMode: true,
+            noiseIntensity: 0.012,
             scanlineIntensity: 0,
-            speed: 1.6,
+            speed: 0.72,
             scanlineFrequency: 5,
             warpAmount: 0,
             resolutionScale: 1
@@ -13291,10 +13362,12 @@
         interestCalcOverlay.classList.add('visible');
         if (interestCalcBg && !interestCalcDitherInstance) {
           interestCalcDitherInstance = initDarkVeil(interestCalcBg, {
-            hueShift: 0,
-            noiseIntensity: 0.03,
+            hueShift: 205,
+            tintColor: '#268FDA',
+            lightMode: true,
+            noiseIntensity: 0.012,
             scanlineIntensity: 0,
-            speed: 1.6,
+            speed: 0.72,
             scanlineFrequency: 5,
             warpAmount: 0,
             resolutionScale: 1
@@ -13549,10 +13622,12 @@
         passwordGenOverlay.classList.add('visible');
         if (passwordGenBg && !passwordGenDitherInstance) {
           passwordGenDitherInstance = initDarkVeil(passwordGenBg, {
-            hueShift: 0,
-            noiseIntensity: 0.03,
+            hueShift: 205,
+            tintColor: '#36B8C8',
+            lightMode: true,
+            noiseIntensity: 0.012,
             scanlineIntensity: 0,
-            speed: 1.6,
+            speed: 0.72,
             scanlineFrequency: 5,
             warpAmount: 0,
             resolutionScale: 1
@@ -14060,7 +14135,7 @@
 
         const mergedBytes = await mergedPdf.save();
 
-        // Save to Documents/ToolKnit/merged/
+        // Save to Documents/Karui 工具箱/merged/
         let outputPath;
         if (isTauri) {
           const { invoke } = await import('@tauri-apps/api/core');
@@ -14172,8 +14247,8 @@
         pdfCompressOverlay.classList.add('visible');
         if (pdfCompressFerrofluid && !pdfCompressFerrofluidInstance) {
           pdfCompressFerrofluidInstance = initFerrofluid(pdfCompressFerrofluid, {
-            colors: ['#e8e8ec', '#a0a0a8', '#ffffff'],
-            opacity: 0.6,
+            colors: ['#DDF7F8', '#78D7E0', '#268FDA'],
+            opacity: 0.22,
           });
         }
       }
@@ -14609,13 +14684,13 @@
       }
 
       // ===== Favorites System =====
-      const FAV_KEY = 'toolknit_favorites';
+      const FAV_KEY = 'karui_toolbox_favorites';
       const toastEl = document.getElementById('favToast');
       const toastText = document.getElementById('favToastText');
       let toastTimer = null;
 
       function isLoggedIn() {
-        return !!localStorage.getItem('toolknit_token');
+        return !!localStorage.getItem('karui_toolbox_token');
       }
 
       function showToast(msg) {
@@ -14672,7 +14747,7 @@
 
       // Right-click on audio-list-item → direct toggle favorite
       // Also track recent usage on click
-      const RECENT_KEY = 'toolknit_recent_tools';
+      const RECENT_KEY = 'karui_toolbox_recent_tools';
       const MAX_RECENT = 3;
 
       // Global: when a tool overlay's back button is clicked, return to home if navigated from home
@@ -14761,7 +14836,7 @@
               setTimeout(() => {
                 const toolItem = document.querySelector(`.audio-list-item[data-tool="${toolId}"]`);
                 if (toolItem) toolItem.click();
-              }, 1100);
+              }, 340);
             }
           });
         });
@@ -14807,7 +14882,7 @@
               setTimeout(() => {
                 const toolItem = document.querySelector(`.audio-list-item[data-tool="${toolId}"]`);
                 if (toolItem) toolItem.click();
-              }, 1100);
+              }, 340);
             }
           });
         });
@@ -14839,7 +14914,7 @@
               setTimeout(() => {
                 const toolItem = document.querySelector(`.audio-list-item[data-tool="${toolId}"]`);
                 if (toolItem) toolItem.click();
-              }, 1100);
+              }, 340);
             }
           });
         });

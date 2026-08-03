@@ -8,11 +8,11 @@
       {
         "version": "1.0测试版",
         "date": "2026-06-30",
-        "title": "ToolKnit 桌面客户端首个公开测试版",
+        "title": "Karui 工具箱 桌面客户端首个公开测试版",
         "content": [
           "桌面客户端首发：Windows 原生 .exe 应用，安装即用，支持深色主题与 WebGL 动态背景",
           "中英双语界面：一键切换中文/English，全部工具文案、提示与按钮均已完成本地化",
-          "蜘蛛精灵加载动画：页面切换与工具处理过程中加入专属蜘蛛吉祥物过渡动画",
+          "Karui 能量核心动画：页面切换与工具处理过程中加入品牌化动态轨道效果",
           "统一安装器：可视化安装向导，支持自定义安装路径、桌面快捷方式、开始菜单入口",
           "PDF 工具箱：PDF 转图片、拆分、合并、压缩、旋转、加密/解密、格式转换、页码提取、水印处理",
           "图片工具箱：格式转换、批量转换、压缩、批量压缩、图片去水印、裁剪、拼图",
@@ -42,7 +42,7 @@
           "统一安装器：支持自定义安装路径、桌面快捷方式、开始菜单入口",
           "安装器双源下载：中文用户优先从 RainS3 下载，英文用户优先从 R2 下载",
           "安装语言选择：安装向导支持中文与英文界面，根据用户选择生成配置",
-          "蜘蛛精灵加载动画：页面切换与处理过程中加入专属蜘蛛吉祥物过渡动画",
+          "Karui 能量核心动画：页面切换与处理过程中加入品牌化动态轨道效果",
           "WebGL 动态背景：首页与关键页面加入深色流体动态背景，提升视觉体验",
           "用户统计面板：首页显示总使用次数、个人使用次数与最近使用记录"
         ]
@@ -103,11 +103,11 @@
       {
         "version": "v1.0 Beta",
         "date": "2026-06-30",
-        "title": "First Public Beta of ToolKnit Desktop",
+        "title": "First Public Beta of Karui 工具箱",
         "content": [
           "Desktop client debut: Native Windows .exe app, install and run, dark theme with WebGL dynamic background",
           "Bilingual interface: One-click switch between Chinese/English, all tool labels, prompts and buttons localized",
-          "Spider mascot loading animation: Exclusive spider mascot transition animation during page switches and processing",
+          "Karui energy-core animation: Branded orbital motion during page switches and processing",
           "Unified installer: Visual installation wizard with custom install path, desktop shortcut and start menu support",
           "PDF toolkit: PDF to image, split, merge, compress, rotate, encrypt/decrypt, format conversion, page extraction, watermark",
           "Image toolkit: Format conversion, batch conversion, compress, batch compress, watermark removal, crop, collage",
@@ -137,7 +137,7 @@
           "Unified installer: Support custom install path, desktop shortcut, and start menu entry",
           "Installer dual-source download: Chinese users prefer RainS3, English users prefer R2",
           "Installer language selection: Installer supports Chinese and English interface, generates config based on user choice",
-          "Spider mascot loading animation: Exclusive spider mascot transition animation during page switches and processing",
+          "Karui energy-core animation: Branded orbital motion during page switches and processing",
           "WebGL dynamic background: Dark fluid dynamic background added to home and key pages for better visual experience",
           "User statistics panel: Home page displays total usage count, personal usage count, and recent usage records"
         ]

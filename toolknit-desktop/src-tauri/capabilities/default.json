@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "permissions for ToolKnit Desktop",
+  "description": "permissions for Karui 工具箱",
   "windows": [
     "main"
   ],

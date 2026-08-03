@@ -2,8 +2,8 @@ export const HELP_CONTENT_EN = {
   'overview': {
     title: 'Overview',
     html: `<div class="help-doc">
-      <h2>ToolKnit Overview</h2>
-      <p>ToolKnit is a <strong>fully local</strong> multi-functional toolbox desktop app, covering eight tool categories: PDF, Image, Audio, Video, Text, Calculator, Creative, and AI. All file processing is done locally — no uploads to servers.</p>
+      <h2>Karui 工具箱 Overview</h2>
+      <p>Karui 工具箱 is a <strong>fully local</strong> multi-functional toolbox desktop app, covering eight tool categories: PDF, Image, Audio, Video, Text, Calculator, Creative, and AI. All file processing is done locally — no uploads to servers.</p>
 
       <h3>Tool Categories</h3>
       <div class="help-tool-grid">
@@ -47,9 +47,9 @@ export const HELP_CONTENT_EN = {
 
       <h3>Installation Steps</h3>
       <ol class="help-steps">
-        <li>Download the ToolKnit installer (<code>.exe</code> setup program)</li>
+        <li>Download the Karui 工具箱 installer (<code>.exe</code> setup program)</li>
         <li>Double-click the installer and choose the installation path</li>
-        <li>Wait for installation to complete — a ToolKnit shortcut will appear on your desktop</li>
+        <li>Wait for installation to complete — a Karui 工具箱 shortcut will appear on your desktop</li>
         <li>Double-click the shortcut to launch the app</li>
       </ol>
 
@@ -75,10 +75,10 @@ export const HELP_CONTENT_EN = {
       <p>Displays the current version number. Click "Check for Updates" to manually detect new versions. If available, the changelog is shown with a download prompt.</p>
 
       <h3>Default Storage Location</h3>
-      <p>Shows the default file save path (usually the ToolKnit folder in your Documents). Click "Open Folder" to quickly access it.</p>
+      <p>Shows the default file save path (usually the Karui 工具箱 folder in your Documents). Click "Open Folder" to quickly access it.</p>
 
-      <h3>Help & Feedback</h3>
-      <p>Click "Help Center" to open this help page; click "Feedback" to submit bug reports or suggestions.</p>
+      <h3>Help</h3>
+      <p>Click “Help Center” to open this page and browse feature guides and frequently asked questions.</p>
     </div>`
   },
 
@@ -88,7 +88,7 @@ export const HELP_CONTENT_EN = {
       <h2>Version Updates</h2>
 
       <h3>Automatic Update Check</h3>
-      <p>ToolKnit automatically checks for new versions on startup. If a new version is found, an update prompt appears showing the new version number and changelog.</p>
+      <p>Karui 工具箱 automatically checks for new versions on startup. If a new version is found, an update prompt appears showing the new version number and changelog.</p>
 
       <h3>Manual Update Check</h3>
       <ol class="help-steps">
@@ -350,7 +350,7 @@ export const HELP_CONTENT_EN = {
         <li><strong>AAC</strong>: High compression ratio lossy format</li>
         <li><strong>WAV</strong>: Lossless uncompressed format</li>
         <li><strong>FLAC</strong>: Lossless compressed format</li>
-        <li><strong>OGG</strong>: Open-source lossy format</li>
+        <li><strong>OGG</strong>: General-purpose lossy audio format</li>
       </ul>
     </div>`
   },
@@ -795,8 +795,8 @@ export const HELP_CONTENT_EN = {
       <h2>FAQ - General</h2>
 
       <div class="help-faq-item">
-        <div class="help-faq-q">Q: Is ToolKnit free?</div>
-        <div class="help-faq-a">A: Yes, ToolKnit is completely free to use, with no ads or in-app purchases.</div>
+        <div class="help-faq-q">Q: Is Karui 工具箱 free?</div>
+        <div class="help-faq-a">A: Yes, Karui 工具箱 is completely free to use, with no ads or in-app purchases.</div>
       </div>
 
       <div class="help-faq-item">
@@ -816,7 +816,7 @@ export const HELP_CONTENT_EN = {
 
       <div class="help-faq-item">
         <div class="help-faq-q">Q: Where are my files saved?</div>
-        <div class="help-faq-a">A: By default, files are saved in the ToolKnit folder under your Documents. You can view and open the storage location from the settings page.</div>
+        <div class="help-faq-a">A: By default, files are saved in the Karui 工具箱 folder under your Documents. You can view and open the storage location from the settings page.</div>
       </div>
 
       <div class="help-faq-item">
@@ -833,7 +833,7 @@ export const HELP_CONTENT_EN = {
 
       <div class="help-faq-item">
         <div class="help-faq-q">Q: What is the FFmpeg extension?</div>
-        <div class="help-faq-a">A: FFmpeg is an open-source multimedia processing library. ToolKnit's audio conversion, video conversion, and other features depend on it. You'll be automatically prompted to download it on first use.</div>
+        <div class="help-faq-a">A: FFmpeg is a multimedia processing component used by Karui 工具箱 for audio and video conversion. You'll be automatically prompted to download it on first use.</div>
       </div>
 
       <div class="help-faq-item">
@@ -875,7 +875,7 @@ export const HELP_CONTENT_EN = {
 
       <div class="help-faq-item">
         <div class="help-faq-q">Q: Does the app collect usage data?</div>
-        <div class="help-faq-a">A: ToolKnit does not collect any user privacy data and contains no tracking code or analytics tools.</div>
+        <div class="help-faq-a">A: Karui 工具箱 does not collect any user privacy data and contains no tracking code or analytics tools.</div>
       </div>
     </div>`
   },

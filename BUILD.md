@@ -1,6 +1,6 @@
-# ToolKnit Desktop 构建指南
+# Karui 工具箱 构建指南
 
-本文档面向希望从源码构建 ToolKnit 桌面端的开发者。
+本文档面向希望从源码构建 Karui 工具箱 桌面端的开发者。
 
 ## 环境要求
 
@@ -57,8 +57,8 @@ npm run tauri build
 
 构建产物:
 
-- 单文件 exe: `src-tauri/target/release/toolknit-desktop.exe`
-- NSIS 安装包: `src-tauri/target/release/bundle/nsis/toolknit-desktop_*_x64-setup.exe`
+- 单文件 exe: `src-tauri/target/release/karui-toolbox.exe`
+- NSIS 安装包: `src-tauri/target/release/bundle/nsis/Karui_工具箱_*_x64-setup.exe`
 
 ## 常见问题
 
@@ -70,12 +70,12 @@ npm run tauri build
 
 首次编译需要下载大量依赖,可能需要 10-20 分钟。后续增量编译会快很多(约 40 秒)。
 
-### 3. 提示 `toolknit-desktop.exe` 正在运行无法覆盖
+### 3. 提示 `karui-toolbox.exe` 正在运行无法覆盖
 
-关闭正在运行的 ToolKnit 进程后再重新构建:
+关闭正在运行的 Karui 工具箱 进程后再重新构建:
 
 ```bash
-taskkill /F /IM toolknit-desktop.exe
+taskkill /F /IM karui-toolbox.exe
 ```
 
 ### 4. 网络问题导致依赖下载失败

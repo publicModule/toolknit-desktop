@@ -5,10 +5,10 @@ const LEGAL_CONTENT_ZH = {
     title: '程序声明',
     html: `<div class="help-doc">
       <h2>程序声明</h2>
-      <p>本声明旨在明确 ToolKnit（以下简称"本软件"）的开发者（以下简称"开发者"）与用户之间的权利义务关系。用户在安装、使用本软件之前，请仔细阅读本声明。一旦用户开始使用本软件，即视为已充分理解并接受本声明的全部内容。</p>
+      <p>本声明旨在明确 Karui 工具箱（以下简称"本软件"）的开发者（以下简称"开发者"）与用户之间的权利义务关系。用户在安装、使用本软件之前，请仔细阅读本声明。一旦用户开始使用本软件，即视为已充分理解并接受本声明的全部内容。</p>
 
       <h3>一、软件性质</h3>
-      <p>本软件是一款<strong>免费、非开源</strong>的本地多功能工具箱桌面应用程序，由开发者独立开发和维护。本软件不包含任何广告、内购或付费功能，不以盈利为目的。</p>
+      <p>本软件是一款本地多功能工具箱桌面应用程序，文件处理均在用户设备本地完成。</p>
 
       <h3>二、本地处理与隐私</h3>
       <p>本软件的<strong>所有文件处理功能</strong>（包括但不限于 PDF、图片、音频、视频、文本等工具）均在用户本地设备上完成，不会将用户的文件上传到任何服务器。开发者无法获取、查看或恢复用户处理的任何文件内容。</p>
@@ -20,17 +20,16 @@ const LEGAL_CONTENT_ZH = {
         <li><strong>用户认证</strong>：用户注册、登录时传输邮箱、用户名等账户信息</li>
         <li><strong>使用次数统计</strong>：仅记录工具使用次数计数（不包含文件内容或个人信息），用于展示总使用次数</li>
         <li><strong>版本更新检查</strong>：检查是否有新版本可用</li>
-        <li><strong>反馈提交</strong>：用户主动提交的反馈内容</li>
         <li><strong>AI 接口调用</strong>：AI 工具处理文本时调用第三方 API</li>
       </ul>
 
       <h3>四、第三方组件</h3>
-      <p>本软件使用了以下开源第三方组件和库：</p>
+      <p>本软件使用了以下第三方组件和库：</p>
       <ul>
         <li><strong>FFmpeg</strong>：多媒体处理库，用于音频/视频格式转换、压缩等功能</li>
         <li><strong>pdf-lib</strong>：PDF 文档处理库</li>
         <li><strong>Lucide Icons</strong>：图标库</li>
-        <li><strong>其他开源库</strong>：详见各库的开源许可协议</li>
+        <li><strong>其他第三方库</strong>：详见各库对应的许可协议</li>
       </ul>
       <p>这些第三方组件的版权归各自所有者所有，本软件仅作为使用者调用其功能。开发者不对第三方组件的安全性、稳定性或合规性承担责任。</p>
 
@@ -67,11 +66,8 @@ const LEGAL_CONTENT_ZH = {
       <h3>九、适用法律</h3>
       <p>本声明的解释和适用以中华人民共和国法律为准。因本声明或使用本软件产生的任何争议，双方应友好协商解决；协商不成的，任何一方均可向开发者所在地有管辖权的人民法院提起诉讼。</p>
 
-      <h3>十、联系方式</h3>
-      <p>如对本声明有任何疑问，可通过软件内的<strong>反馈功能</strong>与开发者联系。</p>
-
       <div class="help-note">
-        <p>最后更新日期：2025年7月1日<br/>开发者：董子航</p>
+        <p>最后更新日期：2025年7月1日</p>
       </div>
     </div>`
   },
@@ -80,7 +76,7 @@ const LEGAL_CONTENT_ZH = {
     title: '使用规范',
     html: `<div class="help-doc">
       <h2>使用规范</h2>
-      <p>本使用规范旨在明确用户在使用 ToolKnit（以下简称"本软件"）时应遵守的规则和注意事项。用户在使用本软件前，请仔细阅读本规范。一旦开始使用本软件，即视为已充分理解并接受本规范的全部内容。</p>
+      <p>本使用规范旨在明确用户在使用 Karui 工具箱（以下简称"本软件"）时应遵守的规则和注意事项。用户在使用本软件前，请仔细阅读本规范。一旦开始使用本软件，即视为已充分理解并接受本规范的全部内容。</p>
 
       <h3>一、合法使用</h3>
       <p>用户在使用本软件时，必须遵守中华人民共和国相关法律法规以及用户所在国家/地区的适用法律。用户不得利用本软件从事以下行为：</p>
@@ -168,7 +164,7 @@ const LEGAL_CONTENT_ZH = {
       </div>
 
       <div class="help-note">
-        <p>最后更新日期：2025年7月1日<br/>开发者：董子航</p>
+        <p>最后更新日期：2025年7月1日</p>
       </div>
     </div>`
   }
@@ -179,10 +175,10 @@ const LEGAL_CONTENT_EN = {
     title: 'Program Declaration',
     html: `<div class="help-doc">
       <h2>Program Declaration</h2>
-      <p>This declaration aims to clarify the rights and obligations between the developer of ToolKnit (hereinafter "the Software") and the user. Please read this declaration carefully before installing and using the Software. By using the Software, you are deemed to have fully understood and accepted all contents of this declaration.</p>
+      <p>This declaration aims to clarify the rights and obligations between the developer of Karui 工具箱 (hereinafter "the Software") and the user. Please read this declaration carefully before installing and using the Software. By using the Software, you are deemed to have fully understood and accepted all contents of this declaration.</p>
 
       <h3>1. Software Nature</h3>
-      <p>The Software is a <strong>free, non-open-source</strong> local multi-functional toolbox desktop application, independently developed and maintained by the developer. The Software contains no advertisements, in-app purchases, or paid features, and is not intended for profit.</p>
+      <p>The Software is a local multi-functional toolbox desktop application. File processing is performed locally on the user's device.</p>
 
       <h3>2. Local Processing & Privacy</h3>
       <p>All file processing features of the Software (including but not limited to PDF, image, audio, video, text tools) are performed on the user's local device. User files are not uploaded to any server. The developer cannot access, view, or recover any file content processed by users.</p>
@@ -194,17 +190,16 @@ const LEGAL_CONTENT_EN = {
         <li><strong>User Authentication</strong>: Transmitting email, username, and other account information during registration and login</li>
         <li><strong>Usage Count</strong>: Only recording tool usage count (excluding file content or personal information), used to display total usage</li>
         <li><strong>Version Update Check</strong>: Checking for available new versions</li>
-        <li><strong>Feedback Submission</strong>: Feedback content voluntarily submitted by users</li>
         <li><strong>AI API Calls</strong>: Calling third-party APIs when AI tools process text</li>
       </ul>
 
       <h3>4. Third-Party Components</h3>
-      <p>The Software uses the following open-source third-party components and libraries:</p>
+      <p>The Software uses the following third-party components and libraries:</p>
       <ul>
         <li><strong>FFmpeg</strong>: Multimedia processing library, used for audio/video format conversion, compression, etc.</li>
         <li><strong>pdf-lib</strong>: PDF document processing library</li>
         <li><strong>Lucide Icons</strong>: Icon library</li>
-        <li><strong>Other open-source libraries</strong>: See respective open-source license agreements</li>
+        <li><strong>Other third-party libraries</strong>: See their respective license agreements</li>
       </ul>
       <p>The copyrights of these third-party components belong to their respective owners. The Software only uses them as a caller. The developer is not responsible for the security, stability, or compliance of third-party components.</p>
 
@@ -241,11 +236,8 @@ const LEGAL_CONTENT_EN = {
       <h3>9. Applicable Law</h3>
       <p>This declaration is interpreted and applied in accordance with the laws of the People's Republic of China. Any disputes arising from this declaration or the use of the Software shall be resolved through amicable negotiation; if negotiation fails, either party may file a lawsuit with the people's court having jurisdiction at the developer's location.</p>
 
-      <h3>10. Contact</h3>
-      <p>If you have any questions about this declaration, you can contact the developer through the <strong>Feedback</strong> feature in the Software.</p>
-
       <div class="help-note">
-        <p>Last updated: July 1, 2025<br/>Developer: Zihang Dong</p>
+        <p>Last updated: July 1, 2025</p>
       </div>
     </div>`
   },
@@ -254,7 +246,7 @@ const LEGAL_CONTENT_EN = {
     title: 'Usage Policy',
     html: `<div class="help-doc">
       <h2>Usage Policy</h2>
-      <p>This usage policy aims to clarify the rules and precautions that users must follow when using ToolKnit (hereinafter "the Software"). Please read this policy carefully before using the Software. By using the Software, you are deemed to have fully understood and accepted all contents of this policy.</p>
+      <p>This usage policy aims to clarify the rules and precautions that users must follow when using Karui 工具箱 (hereinafter "the Software"). Please read this policy carefully before using the Software. By using the Software, you are deemed to have fully understood and accepted all contents of this policy.</p>
 
       <h3>1. Lawful Use</h3>
       <p>When using the Software, users must comply with the relevant laws and regulations of the People's Republic of China and the applicable laws of the user's country/region. Users must not use the Software to engage in the following:</p>
@@ -342,7 +334,7 @@ const LEGAL_CONTENT_EN = {
       </div>
 
       <div class="help-note">
-        <p>Last updated: July 1, 2025<br/>Developer: Zihang Dong</p>
+        <p>Last updated: July 1, 2025</p>
       </div>
     </div>`
   }
