@@ -59,6 +59,14 @@
         </div>
 
         <div class="settings-section">
+          <h3 class="settings-section-title" data-i18n="settings.aiPlatform">AI 平台</h3>
+          <div class="settings-row">
+            <span class="settings-version" data-i18n="settings.aiPlatformDesc">配置 AI 平台与访问密钥</span>
+            <button class="settings-btn" id="openApiKeySettings" data-i18n="settings.configureAi">配置密钥</button>
+          </div>
+        </div>
+
+        <div class="settings-section">
           <h3 class="settings-section-title" data-i18n="settings.helpFeedback">帮助</h3>
           <div class="settings-links">
             <a class="settings-link" href="#" id="helpLink" data-i18n="settings.helpCenter">帮助中心</a>
@@ -4239,8 +4247,8 @@
       <div class="ffmpeg-overlay-bg" id="aiLoginOverlayBg"></div>
       <div class="ffmpeg-overlay-content">
         <div class="tk-mascot-lg" aria-hidden="true"></div>
-        <h2 class="ffmpeg-overlay-title" data-i18n="home.aiLogin.title">需要登录</h2>
-        <p class="ffmpeg-overlay-desc" data-i18n="home.aiLogin.desc">AI 功能需要登录后使用，请在设置页面配置 AI 平台密钥</p>
+        <h2 class="ffmpeg-overlay-title" data-i18n="home.aiLogin.title">需要配置</h2>
+        <p class="ffmpeg-overlay-desc" data-i18n="home.aiLogin.desc">AI 功能需要先配置 AI 平台密钥，请前往设置完成配置。</p>
         <div class="ffmpeg-overlay-actions">
           <button class="ffmpeg-overlay-btn ffmpeg-overlay-cancel" id="aiLoginCancel" data-i18n="home.aiLogin.cancel">取消</button>
           <button class="ffmpeg-overlay-btn ffmpeg-overlay-confirm" id="aiLoginGoSettings" data-i18n="home.aiLogin.goSettings">去设置</button>

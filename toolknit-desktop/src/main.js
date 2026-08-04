@@ -4750,6 +4750,7 @@
 
       // API Key button
       const btnApiKey = document.getElementById('btnApiKey');
+      const settingsApiKeyBtn = document.getElementById('openApiKeySettings');
       const apiKeyOverlay = document.getElementById('apiKeyOverlay');
       const apiKeyBack = document.getElementById('apiKeyBack');
       const apiKeyInput = document.getElementById('apiKeyInput');
@@ -4827,18 +4828,26 @@
         });
       }
 
-      if (btnApiKey && apiKeyOverlay) {
+      function openApiKeySettings() {
+        if (!apiKeyOverlay) return;
+        const savedPlatform = localStorage.getItem('ai_platform') || 'deepseek';
+        const savedKey = localStorage.getItem('ai_api_key') || '';
+        setApiKeyPlatform(savedPlatform);
+        if (apiKeyInput) apiKeyInput.value = savedKey;
+        if (apiKeyCustomUrl) apiKeyCustomUrl.value = localStorage.getItem('ai_custom_url') || '';
+        if (apiKeyCustomModel) apiKeyCustomModel.value = localStorage.getItem('ai_custom_model') || '';
+        if (apiKeyStatus) apiKeyStatus.classList.remove('show', 'success', 'error');
+        apiKeyOverlay.classList.add('visible');
+      }
+
+      if (btnApiKey) {
         btnApiKey.addEventListener('click', (e) => {
           e.stopPropagation();
-          const savedPlatform = localStorage.getItem('ai_platform') || 'deepseek';
-          const savedKey = localStorage.getItem('ai_api_key') || '';
-          setApiKeyPlatform(savedPlatform);
-          apiKeyInput.value = savedKey;
-          if (apiKeyCustomUrl) apiKeyCustomUrl.value = localStorage.getItem('ai_custom_url') || '';
-          if (apiKeyCustomModel) apiKeyCustomModel.value = localStorage.getItem('ai_custom_model') || '';
-          apiKeyStatus.classList.remove('show', 'success', 'error');
-          apiKeyOverlay.classList.add('visible');
+          openApiKeySettings();
         });
+      }
+      if (settingsApiKeyBtn) {
+        settingsApiKeyBtn.addEventListener('click', openApiKeySettings);
       }
       if (apiKeyBack && apiKeyOverlay) {
         apiKeyBack.addEventListener('click', () => {
@@ -4909,7 +4918,7 @@
       if (aiLoginGoSettings) {
         aiLoginGoSettings.addEventListener('click', () => {
           hideAiLoginOverlay();
-          if (btnApiKey) btnApiKey.click();
+          openApiKeySettings();
         });
       }
 

@@ -2,6 +2,8 @@
   "name": "karui-toolbox",
   "private": true,
   "version": "0.1.0",
+  "author": "Mr·Fan",
+  "publisher": "dk-plus",
   "type": "module",
   "scripts": {
     "dev": "vite",

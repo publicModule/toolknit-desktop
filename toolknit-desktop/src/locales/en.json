@@ -21,8 +21,8 @@
   },
   "home": {
     "aiLogin": {
-      "title": "Login Required",
-      "desc": "AI features require login and an AI platform key. Please configure it in Settings.",
+      "title": "Setup Required",
+      "desc": "Configure an AI provider and access key in Settings before using AI features.",
       "cancel": "Cancel",
       "goSettings": "Go to Settings"
     },
@@ -1274,6 +1274,9 @@
     "chinese": "中文",
     "storagePath": "Default Storage Location",
     "openFolder": "Open Folder",
+    "aiPlatform": "AI Platform",
+    "aiPlatformDesc": "Configure your AI provider and access key",
+    "configureAi": "Configure Key",
     "chooseFolder": "Choose Folder",
     "notSelected": "Not selected",
     "version": "Version & Updates",

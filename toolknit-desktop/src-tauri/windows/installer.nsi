@@ -77,11 +77,13 @@ OutFile "${OUTFILE}"
 InstallDir "${PLACEHOLDER_INSTALL_DIR}"
 
 VIProductVersion "${VERSIONWITHBUILD}"
+VIAddVersionKey "CompanyName" "${MANUFACTURER}"
 VIAddVersionKey "ProductName" "${PRODUCTNAME}"
 VIAddVersionKey "FileDescription" "${PRODUCTNAME}"
 VIAddVersionKey "LegalCopyright" "${COPYRIGHT}"
 VIAddVersionKey "FileVersion" "${VERSION}"
 VIAddVersionKey "ProductVersion" "${VERSION}"
+VIAddVersionKey "Comments" "Created by Mr·Fan"
 
 {{#if additional_plugins_path}}
 !addplugindir "${ADDITIONALPLUGINSPATH}"

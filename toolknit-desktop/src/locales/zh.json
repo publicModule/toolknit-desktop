@@ -21,8 +21,8 @@
   },
   "home": {
     "aiLogin": {
-      "title": "需要登录",
-      "desc": "AI 功能需要登录并配置 AI 平台密钥后使用，请前往设置页面完成配置。",
+      "title": "需要配置",
+      "desc": "AI 功能需要先配置 AI 平台密钥，请前往设置完成配置。",
       "cancel": "取消",
       "goSettings": "去设置"
     },
@@ -1274,6 +1274,9 @@
     "chinese": "中文",
     "storagePath": "默认存储位置",
     "openFolder": "打开文件夹",
+    "aiPlatform": "AI 平台",
+    "aiPlatformDesc": "配置 AI 平台与访问密钥",
+    "configureAi": "配置密钥",
     "chooseFolder": "选择文件夹",
     "notSelected": "未选择",
     "version": "版本与更新",

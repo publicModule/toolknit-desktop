@@ -39,6 +39,10 @@
   "bundle": {
     "active": true,
     "targets": ["app", "nsis"],
+    "publisher": "dk-plus",
+    "copyright": "Copyright © 2026 dk-plus",
+    "shortDescription": "Karui 工具箱桌面应用",
+    "longDescription": "由 Mr·Fan 打造的 dk-plus 本地多功能桌面工具箱。",
     "resources": ["resources/ffmpeg/ffmpeg.exe"],
     "icon": [
       "icons/icon.ico"
